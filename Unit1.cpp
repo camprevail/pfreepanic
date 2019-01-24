@@ -35,22 +35,22 @@ int SuspendProcess = 1;
 TStringList *pGamesList;
 TList *pTermList;
 
-#define MODULE_NAME L"soundvoltex.dll"
+#define MODULE_NAME L"museca.dll"
 #define MEM_OFFSET  0xC00 // offset padding relative to .dll file
 
-ULONG data0_offset[] = { 0x1CEE4F, 0x196BDF };
-ULONG data1_offset[] = { 0x1CF016, 0x196C66 };
+ULONG data0_offset[] = { 0x000000, 0x000000 };
+ULONG data1_offset[] = { 0x17E587, 0x17E587 };
 #define DATA1_SIZE 16
 
-BYTE pf_off0[] = { 0x00, 0x00 };
+BYTE pf_off0[] = { 0x4D, 0x5A };
 BYTE pf_off1[2][16] = {
-		{ 0x8B, 0x83, 0x64, 0x10, 0x00, 0x00, 0x8D, 0x48, 0x01, 0x83, 0xF9, 0x04, 0x56, 0x57, 0x7F, 0x52 },
-		{ 0x8B, 0x83, 0x78, 0x0A, 0x00, 0x00, 0x8D, 0x48, 0x01, 0x83, 0xF9, 0x03, 0x56, 0x57, 0x7F, 0x52 }
+		{ 0XFF, 0X83, 0X48, 0X14, 0X00, 0X00, 0X48, 0X83, 0XC4, 0X20, 0X5B, 0XC3, 0XCC, 0XCC, 0XCC, 0XCC },
+		{ 0XFF, 0X83, 0X48, 0X14, 0X00, 0X00, 0X48, 0X83, 0XC4, 0X20, 0X5B, 0XC3, 0XCC, 0XCC, 0XCC, 0XCC }
 	};
-BYTE pf_on0[] = { 0x02, 0x02 };
+BYTE pf_on0[] = { 0x4D, 0x5A };
 BYTE pf_on1[2][16] = {
-		{ 0xB8, 0x01, 0x00, 0x00, 0x00, 0x89, 0x83, 0x64, 0x10, 0x00, 0x00, 0x90, 0x56, 0x57, 0x90, 0x90 },
-		{ 0xB8, 0x01, 0x00, 0x00, 0x00, 0x89, 0x83, 0x78, 0x0A, 0x00, 0x00, 0x90, 0x56, 0x57, 0x90, 0x90 }
+		{ 0X90, 0X90, 0X90, 0X90, 0X90, 0X90, 0X48, 0X83, 0XC4, 0X20, 0X5B, 0XC3, 0XCC, 0XCC, 0XCC, 0XCC },
+		{ 0X90, 0X90, 0X90, 0X90, 0X90, 0X90, 0X48, 0X83, 0XC4, 0X20, 0X5B, 0XC3, 0XCC, 0XCC, 0XCC, 0XCC }
 	};
 
 
@@ -334,11 +334,11 @@ __fastcall TForm1::TForm1(TComponent* Owner)
 	: TForm(Owner)
 {
 	pGamesList = new TStringList();
-	pGamesList->Add(L"SOUND VOLTEX IV HEAVENLY HAVEN 1");
+	pGamesList->Add(L"MUSECA");
 	pGamesList->Add(L"SOUND VOLTEX III GRAVITY WARS");
 
 	pTermList = new TList();
-	pTermList->Add(new TermWnd(L"SOUND VOLTEX IV HEAVENLY HAVEN 1", L"SOUND VOLTEX IV HEAVENLY HAVEN 1"));
+	pTermList->Add(new TermWnd(L"MUSECA", L"MUSECA"));
 	pTermList->Add(new TermWnd(L"SOUND VOLTEX III GRAVITY WARS", L"SOUND VOLTEX III GRAVITY WARS"));
 	pTermList->Add(new TermWnd(L"beatmania IIDX 24 SINOBUZ", L"beatmania IIDX 24 SINOBUZ"));
 	pTermList->Add(new TermWnd(L"pop'n music eclale", L"pop'n music eclale"));
@@ -423,7 +423,7 @@ void __fastcall TForm1::edtTermKeyExit(TObject *Sender)
 void __fastcall TForm1::btnInfoClick(TObject *Sender)
 {
 	ShowMessage(L"PFree mode is supported on:\n"
-		"\tSOUND VOLTEX IV HEAVENLY HAVEN 1 (2018011602 better continue)\n"
+		"\tMUSECA\n"
 		"\tSOUND VOLTEX III GRAVITY WARS (2016121200)\n\n"
 		"Terminate game is supported on:\n"
 		"\tSOUND VOLTEX IV HEAVENLY HAVEN 1\n"
@@ -437,4 +437,3 @@ void __fastcall TForm1::btnInfoClick(TObject *Sender)
 		);
 }
 //---------------------------------------------------------------------------
-
