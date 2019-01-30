@@ -37,8 +37,8 @@ TList *pTermList;
 
 #define MODULE_NAME L"museca.dll"
 #define MEM_OFFSET  0x17F187 // offset padding relative to .dll file
-							 // calculated from ADDRESS 000000018017F187
-							 //	minus base address 0000000180000000
+			     // calculated from ADDRESS 000000018017F187
+			     //	minus base address 0000000180000000
 ULONG_PTR data0_offset[] = { 0x000000, 0x000000 };
 //ULONG_PTR data1_offset[] = { 0x17E587, 0x17E587 };
 //#define DATA1_SIZE 16
