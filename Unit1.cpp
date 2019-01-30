@@ -10,7 +10,7 @@
 
 #pragma hdrstop
 
-#include "Unit1.h"
+#include "pfreepanic2.h"
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
 #pragma resource "*.dfm"
@@ -36,22 +36,23 @@ TStringList *pGamesList;
 TList *pTermList;
 
 #define MODULE_NAME L"museca.dll"
-#define MEM_OFFSET  0xC00 // offset padding relative to .dll file
+#define MEM_OFFSET  0x17F187 // offset padding relative to .dll file
+							 // calculated from ADDRESS 000000018017F187
+							 //	minus base address 0000000180000000
+ULONG_PTR data0_offset[] = { 0x000000, 0x000000 };
+//ULONG_PTR data1_offset[] = { 0x17E587, 0x17E587 };
+//#define DATA1_SIZE 16
 
-ULONG data0_offset[] = { 0x000000, 0x000000 };
-ULONG data1_offset[] = { 0x17E587, 0x17E587 };
-#define DATA1_SIZE 16
-
-BYTE pf_off0[] = { 0x4D, 0x5A };
-BYTE pf_off1[2][16] = {
+BYTE pf_off0[] = { 0XFF, 0X83, 0X48, 0X14, 0X00, 0X00 };
+/*BYTE pf_off1[2][16] = {
 		{ 0XFF, 0X83, 0X48, 0X14, 0X00, 0X00, 0X48, 0X83, 0XC4, 0X20, 0X5B, 0XC3, 0XCC, 0XCC, 0XCC, 0XCC },
 		{ 0XFF, 0X83, 0X48, 0X14, 0X00, 0X00, 0X48, 0X83, 0XC4, 0X20, 0X5B, 0XC3, 0XCC, 0XCC, 0XCC, 0XCC }
-	};
-BYTE pf_on0[] = { 0x4D, 0x5A };
-BYTE pf_on1[2][16] = {
+	}; */
+BYTE pf_on0[] = { 0X90, 0X90, 0X90, 0X90, 0X90, 0X90 };
+/*BYTE pf_on1[2][16] = {
 		{ 0X90, 0X90, 0X90, 0X90, 0X90, 0X90, 0X48, 0X83, 0XC4, 0X20, 0X5B, 0XC3, 0XCC, 0XCC, 0XCC, 0XCC },
 		{ 0X90, 0X90, 0X90, 0X90, 0X90, 0X90, 0X48, 0X83, 0XC4, 0X20, 0X5B, 0XC3, 0XCC, 0XCC, 0XCC, 0XCC }
-	};
+	}; */
 
 
 UnicodeString WinFormatError(DWORD errNo)
@@ -124,12 +125,12 @@ void TogglePFree()
 	DWORD procID = NULL;
 
 	BYTE data0 = 1;
-	BYTE data1[] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
+	//BYTE data1[] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
 
 	HMODULE hMods[1024];
 	DWORD cbNeeded;
 	bool found = false;
-	ULONG baseAddr = 0;
+	ULONG_PTR baseAddr = 0;
 
 	hWnd = FindGameWnd();
 	if (!hWnd) {
@@ -182,11 +183,13 @@ void TogglePFree()
 			UnicodeString name(szModName);
 			if (name.Pos(MODULE_NAME) > 0) {
 				found = true;
-				baseAddr = (ULONG)info.lpBaseOfDll;
+				baseAddr = (ULONG_PTR)info.lpBaseOfDll;
 				break;
 			}
-//			line.sprintf(L"\t%s\t\t 0x%08X\t\t 0x%08X\t\t 0x%08X", szModName, info.lpBaseOfDll, info.SizeOfImage, info.EntryPoint);
-//			Memo1->Lines->Add(line);
+			txt.sprintf(L"\t%s\t\t 0x%08X\t\t 0x%08X\t\t 0x%08X", szModName, info.lpBaseOfDll, info.SizeOfImage, info.EntryPoint);
+			//Memo1->Lines->Add(line);
+            Form1->MemoResetStyle();
+			Form1->Memo1->Lines->Text = txt;
 		}
 	}
 	if (!found) {
@@ -199,39 +202,39 @@ void TogglePFree()
 		WinError(L"Read process memory failed");
 		goto getout;
 	}
-	if (!ReadProcessMemory(hProc, (BYTE*)baseAddr + MEM_OFFSET + data1_offset[Game], data1, DATA1_SIZE, NULL)) {
+	/*if (!ReadProcessMemory(hProc, (BYTE*)baseAddr + MEM_OFFSET + data1_offset[Game], data1, DATA1_SIZE, NULL)) {
 		WinError(L"Read process memory failed");
 		goto getout;
-	}
+	} */
 
 	// OFF test
-	if (data0 == pf_off0[Game] && memcmp(data1, pf_off1[Game], DATA1_SIZE) == 0)
+	if (data0 == pf_off0[Game] /*&& memcmp(data1, pf_off1[Game], DATA1_SIZE)*/ == 0)
 	{
 		// write PFree ON
 		if (!WriteProcessMemory(hProc, (BYTE*)baseAddr + MEM_OFFSET + data0_offset[Game], pf_on0 + Game, 1, NULL)) {
 			WinError(L"Write process memory failed");
 			goto getout;
 		}
-		if (!WriteProcessMemory(hProc, (BYTE*)baseAddr + MEM_OFFSET + data1_offset[Game], pf_on1[Game], DATA1_SIZE, NULL)) {
+		/*if (!WriteProcessMemory(hProc, (BYTE*)baseAddr + MEM_OFFSET + data1_offset[Game], pf_on1[Game], DATA1_SIZE, NULL)) {
 			WinError(L"Write process memory failed");
 			goto getout;
-		}
+		}    */
 		// notify
 		PlaySound((ExtractFilePath(Application->ExeName) + (Form1->rdgVoice->ItemIndex == 0 ? L"on-eng.wav" : L"on.wav")).c_str(), NULL, SND_FILENAME|SND_ASYNC);
 		Form1->Caption = L"PFREE";
 	} else
 	// ON test
-	if (data0 == pf_on0[Game] && memcmp(data1, pf_on1[Game], DATA1_SIZE) == 0)
+	if (data0 == pf_on0[Game] /*&& memcmp(data1, pf_on1[Game], DATA1_SIZE)*/ == 0)
 	{
 		// write PFree OFF
 		if (!WriteProcessMemory(hProc, (BYTE*)baseAddr + MEM_OFFSET + data0_offset[Game], pf_off0 + Game, 1, NULL)) {
 			WinError(L"Write process memory failed");
 			goto getout;
 		}
-		if (!WriteProcessMemory(hProc, (BYTE*)baseAddr + MEM_OFFSET + data1_offset[Game], pf_off1[Game], DATA1_SIZE, NULL)) {
+		/*if (!WriteProcessMemory(hProc, (BYTE*)baseAddr + MEM_OFFSET + data1_offset[Game], pf_off1[Game], DATA1_SIZE, NULL)) {
 			WinError(L"Write process memory failed");
 			goto getout;
-		}
+		}*/
 		// notify
 		PlaySound((ExtractFilePath(Application->ExeName) + (Form1->rdgVoice->ItemIndex == 0 ? L"off-eng.wav" : L"off.wav")).c_str(), NULL, SND_FILENAME|SND_ASYNC);
 		Form1->Caption = L"NORMAL";
@@ -241,9 +244,9 @@ void TogglePFree()
 		goto getout;
 	}
 
-	txt.sprintf(L"%02X\n%02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X", data0, data1[0],data1[1],data1[2],data1[3],data1[4],data1[5],data1[6],data1[7],data1[8],data1[9],data1[10],data1[11],data1[12],data1[13],data1[14],data1[15]);
-	Form1->MemoResetStyle();
-	Form1->Memo1->Lines->Text = txt;
+	//txt.sprintf(L"%02X\n%02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X", data0);
+   //	Form1->MemoResetStyle();
+   //	Form1->Memo1->Lines->Text = txt;
 
 getout:
 	// cleanup
