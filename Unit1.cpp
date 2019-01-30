@@ -37,9 +37,9 @@ TList *pTermList;
 
 #define MODULE_NAME L"museca.dll"
 #define MEM_OFFSET  0x17F187 // offset padding relative to .dll file
-			     // calculated from ADDRESS 000000018017F187
-			     //	minus base address 0000000180000000
-ULONG_PTR data0_offset[] = { 0x000000, 0x000000 };
+							 // calculated from ADDRESS 000000018017F187
+							 //	minus base address 0000000180000000
+ULONG_PTR data0_offset[] = { 0x17E587, 0x17E587 };
 //ULONG_PTR data1_offset[] = { 0x17E587, 0x17E587 };
 //#define DATA1_SIZE 16
 
@@ -152,7 +152,7 @@ void TogglePFree()
 			}
 		}
 
-		hProc = OpenProcess(/*PROCESS_ALL_ACCESS*/
+		hProc = OpenProcess(PROCESS_ALL_ACCESS |
 				PROCESS_VM_READ | PROCESS_VM_WRITE | PROCESS_VM_OPERATION |
 				PROCESS_QUERY_INFORMATION, FALSE, procID);
 	}
@@ -186,10 +186,10 @@ void TogglePFree()
 				baseAddr = (ULONG_PTR)info.lpBaseOfDll;
 				break;
 			}
-			txt.sprintf(L"\t%s\t\t 0x%08X\t\t 0x%08X\t\t 0x%08X", szModName, info.lpBaseOfDll, info.SizeOfImage, info.EntryPoint);
+		  //	txt.sprintf(L"\t%s\t\t 0x%08X\t\t 0x%08X\t\t 0x%08X", szModName, info.lpBaseOfDll, info.SizeOfImage, info.EntryPoint);
 			//Memo1->Lines->Add(line);
-            Form1->MemoResetStyle();
-			Form1->Memo1->Lines->Text = txt;
+		   // Form1->MemoResetStyle();
+		   //	Form1->Memo1->Lines->Text = txt;
 		}
 	}
 	if (!found) {
@@ -244,9 +244,9 @@ void TogglePFree()
 		goto getout;
 	}
 
-	//txt.sprintf(L"%02X\n%02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X", data0);
-   //	Form1->MemoResetStyle();
-   //	Form1->Memo1->Lines->Text = txt;
+	txt.sprintf(L"%02X\n%02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X", data0);
+   Form1->MemoResetStyle();
+   Form1->Memo1->Lines->Text = txt;
 
 getout:
 	// cleanup
