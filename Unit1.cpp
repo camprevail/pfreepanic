@@ -39,7 +39,7 @@ TList *pTermList;
 #define MEM_OFFSET  0x17F187 // offset padding relative to .dll file
 							 // calculated from ADDRESS 000000018017F187
 							 //	minus base address 0000000180000000
-ULONG_PTR data0_offset[] = { 0x17E587, 0x17E587 };
+unsigned long long data0_offset[] = { 0x17E587, 0x17E587 };
 //ULONG_PTR data1_offset[] = { 0x17E587, 0x17E587 };
 //#define DATA1_SIZE 16
 
@@ -130,7 +130,7 @@ void TogglePFree()
 	HMODULE hMods[1024];
 	DWORD cbNeeded;
 	bool found = false;
-	ULONG_PTR baseAddr = 0;
+	unsigned long long baseAddr = 0;
 
 	hWnd = FindGameWnd();
 	if (!hWnd) {
@@ -183,7 +183,7 @@ void TogglePFree()
 			UnicodeString name(szModName);
 			if (name.Pos(MODULE_NAME) > 0) {
 				found = true;
-				baseAddr = (ULONG_PTR)info.lpBaseOfDll;
+				baseAddr = (unsigned long long)info.lpBaseOfDll;
 				break;
 			}
 		  //	txt.sprintf(L"\t%s\t\t 0x%08X\t\t 0x%08X\t\t 0x%08X", szModName, info.lpBaseOfDll, info.SizeOfImage, info.EntryPoint);
